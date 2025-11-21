@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using GeminiRAG.Models;
 using GeminiRAG.UI;
 
 namespace GeminiRAG.Services;
@@ -20,6 +21,41 @@ public class FileSearchService : IFileSearchService
         _apiKey = apiKey;
         _httpClient = new HttpClient();
         _httpClient.DefaultRequestHeaders.Add("x-goog-api-key", apiKey);
+    }
+
+    public async Task<List<StoreInfo>> ListStoresAsync()
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync($"{_baseUrl}/fileSearchStores");
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ConsoleUI.WriteWarning($"Could not list stores: {responseContent}");
+                return new List<StoreInfo>();
+            }
+
+            var result = JsonSerializer.Deserialize<StoreListResponse>(responseContent);
+            return result?.FileSearchStores?.Select(s => new StoreInfo
+            {
+                Name = s.Name ?? "",
+                DisplayName = s.DisplayName ?? "Unnamed Store",
+                CreateTime = DateTime.TryParse(s.CreateTime, out var create) ? create : null,
+                UpdateTime = DateTime.TryParse(s.UpdateTime, out var update) ? update : null
+            }).ToList() ?? new List<StoreInfo>();
+        }
+        catch (Exception ex)
+        {
+            ConsoleUI.WriteWarning($"Error listing stores: {ex.Message}");
+            return new List<StoreInfo>();
+        }
+    }
+
+    public void UseExistingStore(string storeName)
+    {
+        _storeName = storeName;
+        ConsoleUI.WriteSuccess($"✓ Using existing store: {storeName}");
     }
 
     public async Task<string> CreateStoreAsync(string displayName)
@@ -118,6 +154,66 @@ public class FileSearchService : IFileSearchService
 
         ConsoleUI.WriteSuccess($"✓ PDF uploaded and indexed successfully!");
         return operationName;
+    }
+
+    public async Task<List<string>> UploadMultiplePdfsAsync(string[] filePaths)
+    {
+        var operationNames = new List<string>();
+        
+        ConsoleUI.WriteInfo($"Uploading {filePaths.Length} PDF files...");
+        
+        foreach (var filePath in filePaths)
+        {
+            try
+            {
+                var operationName = await UploadPdfAsync(filePath);
+                operationNames.Add(operationName);
+            }
+            catch (Exception ex)
+            {
+                ConsoleUI.WriteError($"Failed to upload {Path.GetFileName(filePath)}: {ex.Message}");
+            }
+        }
+        
+        ConsoleUI.WriteSuccess($"✓ Uploaded {operationNames.Count}/{filePaths.Length} files successfully!");
+        return operationNames;
+    }
+
+    public async Task<List<DocumentInfo>> ListFilesAsync()
+    {
+        if (string.IsNullOrEmpty(_storeName))
+        {
+            return new List<DocumentInfo>();
+        }
+
+        try
+        {
+            // Correct endpoint: {storeName}/documents not {storeName}/files
+            var response = await _httpClient.GetAsync($"{_baseUrl}/{_storeName}/documents");
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ConsoleUI.WriteWarning($"Could not list files: {responseContent}");
+                return new List<DocumentInfo>();
+            }
+
+            // Parse document list response
+            var result = JsonSerializer.Deserialize<DocumentListResponse>(responseContent);
+            return result?.Documents?.Select(d => new DocumentInfo
+            {
+                Name = d.Name ?? "",
+                DisplayName = d.DisplayName ?? Path.GetFileName(d.Name ?? ""),
+                MimeType = d.MimeType ?? "application/pdf",
+                UploadDate = DateTime.TryParse(d.CreateTime, out var date) ? date : null,
+                Status = "Active"
+            }).ToList() ?? new List<DocumentInfo>();
+        }
+        catch (Exception ex)
+        {
+            ConsoleUI.WriteWarning($"Error listing files: {ex.Message}");
+            return new List<DocumentInfo>();
+        }
     }
 
     public async Task DeleteStoreAsync()
@@ -224,4 +320,31 @@ internal class ErrorInfo
 
     [JsonPropertyName("status")]
     public string? Status { get; set; }
+}
+
+internal class DocumentListResponse
+{
+    [JsonPropertyName("documents")]
+    public List<FileSearchDocument>? Documents { get; set; }
+}
+
+internal class FileSearchDocument
+{
+    [JsonPropertyName("name")]
+    public string? Name { get; set; }
+
+    [JsonPropertyName("displayName")]
+    public string? DisplayName { get; set; }
+
+    [JsonPropertyName("mimeType")]
+    public string? MimeType { get; set; }
+
+    [JsonPropertyName("createTime")]
+    public string? CreateTime { get; set; }
+}
+
+internal class StoreListResponse
+{
+    [JsonPropertyName("fileSearchStores")]
+    public List<FileSearchStoreResponse>? FileSearchStores { get; set; }
 }
