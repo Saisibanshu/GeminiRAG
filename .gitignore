@@ -1,0 +1,15 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+.vs/
+
+## Configuration (contains API keys)
+appsettings.json
+appsettings.*.json
+
+## OS
+.DS_Store
+Thumbs.db
