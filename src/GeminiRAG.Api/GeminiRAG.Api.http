@@ -1,0 +1,6 @@
+@GeminiRAG.Api_HostAddress = http://localhost:5109
+
+GET {{GeminiRAG.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

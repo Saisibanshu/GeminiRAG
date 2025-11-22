@@ -1,0 +1,24 @@
+<div
+    class="upload-container mt-4 p-4 border-2 border-dashed border-gray-300 rounded-lg text-center hover:bg-gray-50 transition-colors">
+    <input type="file" #fileInput (change)="onFileSelected($event)" accept=".pdf" class="hidden">
+
+    <div *ngIf="!selectedFile && !isUploading">
+        <mat-icon class="text-4xl text-gray-400 w-12 h-12">cloud_upload</mat-icon>
+        <p class="mt-2 text-gray-600">Drag and drop PDF here or</p>
+        <button mat-stroked-button color="primary" (click)="fileInput.click()" class="mt-2">Browse Files</button>
+    </div>
+
+    <div *ngIf="selectedFile && !isUploading">
+        <mat-icon class="text-4xl text-primary w-12 h-12">description</mat-icon>
+        <p class="mt-2 font-medium">{{ selectedFile.name }}</p>
+        <div class="flex justify-center gap-2 mt-2">
+            <button mat-raised-button color="primary" (click)="upload()">Upload</button>
+            <button mat-button color="warn" (click)="selectedFile = null">Cancel</button>
+        </div>
+    </div>
+
+    <div *ngIf="isUploading" class="w-full max-w-xs mx-auto">
+        <p class="mb-2 text-primary">Uploading and Indexing...</p>
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div>
+</div>

@@ -1,0 +1,30 @@
+<div class="store-selector-container p-4 bg-white rounded shadow-sm">
+  <div class="flex items-center gap-4">
+    <mat-form-field appearance="outline" class="flex-1">
+      <mat-label>Select Document Store</mat-label>
+      <mat-select [value]="selectedStore" (selectionChange)="onStoreSelected($event.value)">
+        <mat-option *ngFor="let store of stores" [value]="store">
+          <div class="flex justify-between items-center w-full">
+            <span>{{ store.displayName }}</span>
+            <button mat-icon-button color="warn" (click)="deleteStore(store, $event)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <button mat-mini-fab color="primary" (click)="toggleCreate()" matTooltip="Create New Store">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+
+  <div *ngIf="isCreating" class="mt-4 flex items-center gap-2 animate-fade-in">
+    <mat-form-field appearance="outline" class="w-full max-w-md">
+      <mat-label>New Store Name</mat-label>
+      <input matInput [(ngModel)]="newStoreName" placeholder="e.g., Project Docs">
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="createStore()">Create</button>
+    <button mat-button (click)="toggleCreate()">Cancel</button>
+  </div>
+</div>

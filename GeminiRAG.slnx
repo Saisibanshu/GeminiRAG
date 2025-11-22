@@ -1,3 +1,5 @@
 <Solution>
-  <Project Path="GeminiRAG.csproj" />
+  <Project Path="src/GeminiRAG.Api/GeminiRAG.Api.csproj" />
+  <Project Path="src/GeminiRAG.Core/GeminiRAG.Core.csproj" />
+  <Project Path="src/GeminiRAG.Infrastructure/GeminiRAG.Infrastructure.csproj" />
 </Solution>

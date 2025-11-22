@@ -1,11 +1,10 @@
-﻿## .NET
+## .NET
 bin/
 obj/
 *.user
 *.suo
 *.userprefs
 .vs/
-.vscode/
 
 ## Configuration (contains API keys)
 appsettings.json

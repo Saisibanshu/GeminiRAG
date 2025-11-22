@@ -1,0 +1,33 @@
+<mat-sidenav-container class="h-screen">
+  <mat-sidenav #sidenav mode="side" opened class="w-64 border-r">
+    <mat-toolbar color="primary">
+      <span>Gemini RAG</span>
+    </mat-toolbar>
+    <mat-nav-list>
+      <a mat-list-item routerLink="/" routerLinkActive="bg-gray-100 text-primary"
+        [routerLinkActiveOptions]="{exact: true}">
+        <mat-icon matListItemIcon>dashboard</mat-icon>
+        <span matListItemTitle>Dashboard</span>
+      </a>
+      <a mat-list-item routerLink="/history" routerLinkActive="bg-gray-100 text-primary">
+        <mat-icon matListItemIcon>history</mat-icon>
+        <span matListItemTitle>History</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-toolbar class="bg-white border-b shadow-sm flex justify-between">
+      <div class="flex items-center">
+        <button mat-icon-button (click)="sidenav.toggle()" class="mr-2 md:hidden">
+          <mat-icon>menu</mat-icon>
+        </button>
+        <span class="text-lg font-medium">Strict Grounding with Gemini 1.5</span>
+      </div>
+    </mat-toolbar>
+
+    <div class="bg-gray-50 min-h-[calc(100vh-64px)]">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

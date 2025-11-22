@@ -1,0 +1,28 @@
+<div class="history-container mt-8">
+    <h2 class="text-2xl font-bold mb-4">Query History</h2>
+
+    <mat-accordion multi>
+        <mat-expansion-panel *ngFor="let item of history">
+            <mat-expansion-panel-header>
+                <mat-panel-title class="font-medium">
+                    {{ item.question }}
+                </mat-panel-title>
+                <mat-panel-description>
+                    {{ item.timestamp | date:'short' }}
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="py-2">
+                <p class="whitespace-pre-wrap text-gray-800">{{ item.answer }}</p>
+
+                <div *ngIf="item.citations?.length" class="mt-2 text-sm text-gray-500">
+                    <strong>Sources:</strong> {{ item.citations.join(', ') }}
+                </div>
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+
+    <div *ngIf="history.length === 0" class="text-center text-gray-500 py-8">
+        No history available yet.
+    </div>
+</div>
