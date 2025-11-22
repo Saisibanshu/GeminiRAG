@@ -1,6 +1,6 @@
 # Gemini RAG - Full Stack PDF Question Answering
 
-A modern, full-stack **Retrieval Augmented Generation (RAG)** application built with **.NET 9** and **Angular 18**. It leverages Google's **Gemini 1.5 Flash** model and **File Search Tool** to provide strictly grounded answers from your own PDF documents.
+A modern, full-stack **Retrieval Augmented Generation (RAG)** application built with **.NET 9** and **Angular 18**. It leverages Google's **Gemini 2.5 Flash** model and **File Search Tool** to provide strictly grounded answers from your own PDF documents.
 
 ## 🏗️ Architecture
 
