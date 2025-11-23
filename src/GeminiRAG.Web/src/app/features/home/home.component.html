@@ -1,13 +1,20 @@
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
-    <!-- Left Column: Store & Docs -->
-    <div class="md:col-span-1 space-y-6">
+<div class="flex flex-col h-full p-4 gap-3">
+    <!-- Top Bar: Store Selection (Upload removed from top) -->
+    <div class="w-full">
         <app-store-selector></app-store-selector>
-        <app-document-upload></app-document-upload>
-        <app-document-list></app-document-list>
     </div>
 
-    <!-- Right Column: Chat -->
-    <div class="md:col-span-2">
-        <app-chat-interface></app-chat-interface>
+    <!-- Main Content: Chat (Left/Center) + Document List + Upload (Right) -->
+    <div class="flex gap-3 flex-1 min-h-0">
+        <!-- Chat Interface - Takes more space -->
+        <div class="flex-1 min-w-0">
+            <app-chat-interface></app-chat-interface>
+        </div>
+
+        <!-- Right Panel: Upload + Document List -->
+        <div class="w-96 flex flex-col gap-3 overflow-auto">
+            <app-document-upload></app-document-upload>
+            <app-document-list></app-document-list>
+        </div>
     </div>
 </div>

@@ -30,11 +30,27 @@ public class StoresController : ControllerBase
     }
 
     [HttpDelete]
-    public async Task<IActionResult> DeleteStore([FromQuery] string storeName)
+    public async Task<IActionResult> DeleteStore([FromQuery] string storeName, [FromQuery] bool force = false)
     {
         try
         {
-            await _fileSearchService.DeleteStoreAsync(storeName);
+            // If not forcing, check if store has files first
+            if (!force)
+            {
+                var files = await _fileSearchService.ListFilesAsync(storeName);
+                if (files != null && files.Count > 0)
+                {
+                    // Return 409 Conflict with file list
+                    return Conflict(new
+                    {
+                        message = "Store is not empty",
+                        fileCount = files.Count,
+                        files = files.Select(f => new { f.Name, f.DisplayName }).ToList()
+                    });
+                }
+            }
+
+            await _fileSearchService.DeleteStoreAsync(storeName, force);
             return NoContent();
         }
         catch (Exception ex)

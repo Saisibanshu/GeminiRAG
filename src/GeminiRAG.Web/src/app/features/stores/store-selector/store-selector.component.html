@@ -1,30 +1,47 @@
-<div class="store-selector-container p-4 bg-white rounded shadow-sm">
-  <div class="flex items-center gap-4">
-    <mat-form-field appearance="outline" class="flex-1">
-      <mat-label>Select Document Store</mat-label>
-      <mat-select [value]="selectedStore" (selectionChange)="onStoreSelected($event.value)">
-        <mat-option *ngFor="let store of stores" [value]="store">
-          <div class="flex justify-between items-center w-full">
-            <span>{{ store.displayName }}</span>
-            <button mat-icon-button color="warn" (click)="deleteStore(store, $event)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
+<div class="p-3 bg-white rounded-lg shadow-sm">
+  <!-- Normal State - Full width layout -->
+  <div *ngIf="!isCreating" class="w-full flex items-center gap-2">
+    <div class="flex-1">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full">
+        <mat-label>Document Store</mat-label>
+        <mat-select [value]="selectedStore" (selectionChange)="onStoreSelected($event.value)">
+          <mat-option *ngFor="let store of stores" [value]="store">
+            {{ store.displayName }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
 
-    <button mat-mini-fab color="primary" (click)="toggleCreate()" matTooltip="Create New Store">
-      <mat-icon>add</mat-icon>
+    <button mat-stroked-button color="warn" (click)="deleteCurrentStore()" [disabled]="!selectedStore"
+      class="flex-shrink-0">
+      <mat-icon class="mr-1 scale-90">delete</mat-icon>
+      Delete
+    </button>
+
+    <button mat-raised-button color="primary" (click)="toggleCreate()" class="flex-shrink-0">
+      <mat-icon class="mr-1 scale-90">add</mat-icon>
+      New Store
     </button>
   </div>
 
-  <div *ngIf="isCreating" class="mt-4 flex items-center gap-2 animate-fade-in">
-    <mat-form-field appearance="outline" class="w-full max-w-md">
-      <mat-label>New Store Name</mat-label>
-      <input matInput [(ngModel)]="newStoreName" placeholder="e.g., Project Docs">
-    </mat-form-field>
-    <button mat-raised-button color="primary" (click)="createStore()">Create</button>
-    <button mat-button (click)="toggleCreate()">Cancel</button>
+  <!-- Create State - Full width layout -->
+  <div *ngIf="isCreating" class="w-full flex items-center gap-2">
+    <div class="flex-1">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full">
+        <mat-label>New Store Name</mat-label>
+        <input matInput [(ngModel)]="newStoreName" placeholder="e.g., Project Docs" (keyup.enter)="createStore()"
+          autofocus>
+      </mat-form-field>
+    </div>
+
+    <button mat-raised-button color="primary" (click)="createStore()" [disabled]="!newStoreName" class="flex-shrink-0">
+      <mat-icon class="mr-1 scale-90">check</mat-icon>
+      Create
+    </button>
+
+    <button mat-stroked-button (click)="toggleCreate()" class="flex-shrink-0">
+      <mat-icon class="mr-1 scale-90">close</mat-icon>
+      Cancel
+    </button>
   </div>
 </div>

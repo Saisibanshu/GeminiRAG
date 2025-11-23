@@ -53,4 +53,18 @@ public class DocumentsController : ControllerBase
                 System.IO.File.Delete(tempPath);
         }
     }
+
+    [HttpDelete]
+    public async Task<IActionResult> DeleteDocument([FromQuery] string fileName)
+    {
+        try
+        {
+            await _fileSearchService.DeleteFileAsync(fileName);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
 }

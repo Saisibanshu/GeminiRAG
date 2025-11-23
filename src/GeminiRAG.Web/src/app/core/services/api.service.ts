@@ -71,13 +71,29 @@ export class ApiService {
     return this.http.post<{ operation: string }>(`${this.apiUrl}/documents/upload`, formData, { params: { storeName } });
   }
 
+  deleteDocument(fileName: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/documents`, { params: { fileName } });
+  }
+
+  deleteStoreWithFiles(storeName: string, force: boolean = false): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/stores`, { params: { storeName, force: force.toString() } });
+  }
+
   // Query
   query(request: QueryRequest): Observable<QueryResponse> {
     return this.http.post<QueryResponse>(`${this.apiUrl}/query`, request);
   }
 
-  // History
+  // History & Export
   getHistory(): Observable<QueryHistory[]> {
     return this.http.get<QueryHistory[]>(`${this.apiUrl}/export/history`);
+  }
+
+  exportJson(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/export/json`, { responseType: 'blob' });
+  }
+
+  exportMarkdown(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/export/markdown`, { responseType: 'blob' });
   }
 }

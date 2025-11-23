@@ -13,5 +13,6 @@ public interface IFileSearchService
     Task<string> UploadPdfAsync(string storeName, string filePath);
     Task<List<string>> UploadMultiplePdfsAsync(string storeName, string[] filePaths);
     Task<List<DocumentInfo>> ListFilesAsync(string storeName);
-    Task DeleteStoreAsync(string storeName);
+    Task DeleteFileAsync(string fileName);
+    Task DeleteStoreAsync(string storeName, bool force = false);
 }

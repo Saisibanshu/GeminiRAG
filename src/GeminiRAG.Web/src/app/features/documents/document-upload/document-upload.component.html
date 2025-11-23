@@ -1,24 +1,46 @@
-<div
-    class="upload-container mt-4 p-4 border-2 border-dashed border-gray-300 rounded-lg text-center hover:bg-gray-50 transition-colors">
-    <input type="file" #fileInput (change)="onFileSelected($event)" accept=".pdf" class="hidden">
+<div class="upload-container mt-4 p-6 border-2 border-dashed rounded-lg text-center transition-all"
+    [ngClass]="isDragging ? 'border-primary bg-blue-50' : 'border-gray-300 hover:bg-gray-50'"
+    (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
 
-    <div *ngIf="!selectedFile && !isUploading">
-        <mat-icon class="text-4xl text-gray-400 w-12 h-12">cloud_upload</mat-icon>
-        <p class="mt-2 text-gray-600">Drag and drop PDF here or</p>
-        <button mat-stroked-button color="primary" (click)="fileInput.click()" class="mt-2">Browse Files</button>
+    <input type="file" #fileInput (change)="onFileSelected($event)" accept=".pdf" multiple class="hidden">
+
+    <div *ngIf="selectedFiles.length === 0 && !isUploading">
+        <mat-icon class="text-6xl text-gray-400">cloud_upload</mat-icon>
+        <p class="mt-2 text-lg text-gray-600">Drag and drop PDFs here</p>
+        <p class="text-sm text-gray-500">or</p>
+        <button mat-raised-button color="primary" (click)="fileInput.click()" class="mt-2">
+            <mat-icon>folder_open</mat-icon> Browse Files
+        </button>
+        <p class="mt-2 text-xs text-gray-400">Multiple files supported</p>
     </div>
 
-    <div *ngIf="selectedFile && !isUploading">
-        <mat-icon class="text-4xl text-primary w-12 h-12">description</mat-icon>
-        <p class="mt-2 font-medium">{{ selectedFile.name }}</p>
-        <div class="flex justify-center gap-2 mt-2">
-            <button mat-raised-button color="primary" (click)="upload()">Upload</button>
-            <button mat-button color="warn" (click)="selectedFile = null">Cancel</button>
+    <div *ngIf="selectedFiles.length > 0 && !isUploading">
+        <p class="text-lg font-medium mb-3">{{ selectedFiles.length }} file(s) selected</p>
+        <mat-chip-set class="flex flex-wrap justify-center gap-2 mb-4">
+            <mat-chip *ngFor="let file of selectedFiles; let i = index" class="flex items-center">
+                <mat-icon matChipAvatar>description</mat-icon>
+                {{ file.name }}
+                <button matChipRemove (click)="removeFile(i)">
+                    <mat-icon>cancel</mat-icon>
+                </button>
+            </mat-chip>
+        </mat-chip-set>
+        <div class="flex justify-center gap-2">
+            <button mat-raised-button color="primary" (click)="upload()">
+                <mat-icon>cloud_upload</mat-icon> Upload All
+            </button>
+            <button mat-stroked-button color="primary" (click)="fileInput.click()">
+                <mat-icon>add</mat-icon> Add More
+            </button>
+            <button mat-button color="warn" (click)="selectedFiles = []">
+                <mat-icon>clear</mat-icon> Clear All
+            </button>
         </div>
     </div>
 
     <div *ngIf="isUploading" class="w-full max-w-xs mx-auto">
-        <p class="mb-2 text-primary">Uploading and Indexing...</p>
+        <p class="mb-2 text-primary font-medium">Uploading {{ selectedFiles.length }} file(s)...</p>
         <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        <p class="mt-2 text-xs text-gray-500">This may take a while for large files</p>
     </div>
 </div>

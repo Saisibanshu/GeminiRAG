@@ -23,7 +23,7 @@ public class QueryController : ControllerBase
         var response = await _queryService.QueryAsync(request);
 
         // Add to history
-        _historyService.AddQuery(new QueryHistory
+        await _historyService.AddQueryAsync(new QueryHistory
         {
             Timestamp = DateTime.UtcNow,
             Question = request.Question,

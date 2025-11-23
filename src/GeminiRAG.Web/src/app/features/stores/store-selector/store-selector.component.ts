@@ -88,24 +88,60 @@ export class StoreSelectorComponent implements OnInit {
     });
   }
 
+
+  deleteCurrentStore() {
+    if (!this.selectedStore) return;
+    this.deleteStore(this.selectedStore, new Event('click'));
+  }
+
   deleteStore(store: StoreInfo, event: Event) {
     event.stopPropagation();
-    if (confirm(`Are you sure you want to delete store "${store.displayName}"?`)) {
-      this.apiService.deleteStore(store.name).subscribe({
-        next: () => {
-          this.snackBar.open('Store deleted successfully', 'Close', { duration: 3000 });
-          this.loadStores();
-          if (this.selectedStore?.name === store.name) {
-            this.storeService.clearSelection();
-            this.selectedStore = null;
+
+    // First, try to delete normally (will fail if store has files)
+    this.apiService.deleteStore(store.name).subscribe({
+      next: () => {
+        // Store was empty, deleted successfully
+        this.snackBar.open('Store deleted successfully', 'Close', { duration: 3000 });
+        this.loadStores();
+        if (this.selectedStore?.name === store.name) {
+          this.storeService.clearSelection();
+          this.selectedStore = null;
+        }
+      },
+      error: (err) => {
+        console.error(err);
+
+        // Check if it's a 409 Conflict (store not empty)
+        if (err.status === 409 && err.error?.files) {
+          const fileCount = err.error.fileCount;
+          const fileNames = err.error.files.map((f: any) => f.displayName || 'Unknown').join('\n- ');
+
+          // Show confirmation with file list
+          const confirmMsg = `This store contains ${fileCount} file(s):\n\n- ${fileNames}\n\nDeleting the store will permanently delete all these files. Continue?`;
+
+          if (confirm(confirmMsg)) {
+            // User confirmed, force delete
+            this.apiService.deleteStoreWithFiles(store.name, true).subscribe({
+              next: () => {
+                this.snackBar.open(`Store and ${fileCount} file(s) deleted successfully`, 'Close', { duration: 3000 });
+                this.loadStores();
+                if (this.selectedStore?.name === store.name) {
+                  this.storeService.clearSelection();
+                  this.selectedStore = null;
+                }
+              },
+              error: (forceErr) => {
+                console.error(forceErr);
+                this.snackBar.open('Failed to delete store', 'Close', { duration: 5000 });
+              }
+            });
           }
-        },
-        error: (err) => {
-          console.error(err);
+        } else {
+          // Other error
           const msg = err.error?.message || 'Failed to delete store';
           this.snackBar.open(msg, 'Close', { duration: 5000 });
         }
-      });
-    }
+      }
+    });
   }
 }

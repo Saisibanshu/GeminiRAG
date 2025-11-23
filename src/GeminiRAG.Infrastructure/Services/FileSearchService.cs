@@ -211,16 +211,47 @@ Console.WriteLine("[INFO] This may take a while for large files...");
         }
     }
 
-    public async Task DeleteStoreAsync(string storeName)
+    public async Task DeleteFileAsync(string fileName)
+    {
+        if (string.IsNullOrEmpty(fileName))
+        {
+            throw new ArgumentException("File name cannot be empty", nameof(fileName));
+        }
+
+        Console.WriteLine($"[INFO] Deleting file: {fileName}...");
+
+        // fileName already contains the full path like "files/abc123" or "fileSearchStores/xxx/documents/yyy"
+        // Documents need force=true to delete their chunks
+        var response = await _httpClient.DeleteAsync($"{_baseUrl}/{fileName}?force=true");
+
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("[SUCCESS] ✓ File deleted successfully");
+        }
+        else
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"[ERROR] Failed to delete file: {error}");
+            throw new Exception(error);
+        }
+    }
+
+    public async Task DeleteStoreAsync(string storeName, bool force = false)
     {
         if (string.IsNullOrEmpty(storeName))
         {
             return;
         }
 
-        Console.WriteLine($"[INFO] Deleting File Search store: {storeName}...");
+        Console.WriteLine($"[INFO] Deleting File Search store: {storeName} (force={force})...");
 
-        var response = await _httpClient.DeleteAsync($"{_baseUrl}/{storeName}");
+        var url = $"{_baseUrl}/{storeName}";
+        if (force)
+        {
+            url += "?force=true";
+        }
+
+        var response = await _httpClient.DeleteAsync(url);
 
         if (response.IsSuccessStatusCode)
         {

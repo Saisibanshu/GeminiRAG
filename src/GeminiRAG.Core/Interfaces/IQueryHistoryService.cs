@@ -7,7 +7,7 @@ namespace GeminiRAG.Core.Interfaces;
 /// </summary>
 public interface IQueryHistoryService
 {
-    void AddQuery(QueryHistory entry);
-    List<QueryHistory> GetHistory();
-    void ClearHistory();
+    Task AddQueryAsync(QueryHistory entry);
+    Task<List<QueryHistory>> GetHistoryAsync();
+    Task ClearHistoryAsync();
 }

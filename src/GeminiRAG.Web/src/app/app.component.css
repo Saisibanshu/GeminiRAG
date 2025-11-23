@@ -1,0 +1,23 @@
+.sidebar-dark {
+  background: linear-gradient(to bottom, #111827, #1f2937);
+  border-right: 1px solid #374151;
+}
+
+.sidebar-nav .nav-item {
+  color: white !important;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.sidebar-nav .nav-item:hover {
+  background-color: #374151 !important;
+}
+
+.sidebar-nav .nav-item.active-link {
+  background-color: #374151 !important;
+}
+
+.sidebar-nav .nav-item span {
+  color: white !important;
+}

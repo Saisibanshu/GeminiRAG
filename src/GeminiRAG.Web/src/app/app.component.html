@@ -1,32 +1,50 @@
 <mat-sidenav-container class="h-screen">
-  <mat-sidenav #sidenav mode="side" opened class="w-64 border-r">
-    <mat-toolbar color="primary">
-      <span>Gemini RAG</span>
-    </mat-toolbar>
-    <mat-nav-list>
-      <a mat-list-item routerLink="/" routerLinkActive="bg-gray-100 text-primary"
-        [routerLinkActiveOptions]="{exact: true}">
-        <mat-icon matListItemIcon>dashboard</mat-icon>
-        <span matListItemTitle>Dashboard</span>
-      </a>
-      <a mat-list-item routerLink="/history" routerLinkActive="bg-gray-100 text-primary">
-        <mat-icon matListItemIcon>history</mat-icon>
-        <span matListItemTitle>History</span>
-      </a>
-    </mat-nav-list>
+  <mat-sidenav #sidenav mode="side" opened class="sidebar-dark w-56">
+    <div class="p-4 h-full flex flex-col">
+      <!-- App Logo/Title -->
+      <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-700">
+        <div
+          class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+          <mat-icon class="text-white">auto_awesome</mat-icon>
+        </div>
+        <div class="flex flex-col min-w-0">
+          <h2 class="text-base font-bold text-white">Gemini RAG</h2>
+          <span class="text-xs text-gray-400">AI Assistant</span>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <mat-nav-list class="flex-1 sidebar-nav">
+        <a mat-list-item routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}"
+          class="nav-item mb-2">
+          <mat-icon matListItemIcon class="text-blue-400">dashboard</mat-icon>
+          <span matListItemTitle>Dashboard</span>
+        </a>
+        <a mat-list-item routerLink="/history" routerLinkActive="active-link" class="nav-item mb-2">
+          <mat-icon matListItemIcon class="text-green-400">history</mat-icon>
+          <span matListItemTitle>History</span>
+        </a>
+      </mat-nav-list>
+
+      <!-- Footer Info -->
+      <div class="mt-auto pt-4 border-t border-gray-700">
+        <div class="text-xs text-gray-400 flex items-center gap-2">
+          <mat-icon class="text-base">info</mat-icon>
+          <span>Powered by Gemini</span>
+        </div>
+      </div>
+    </div>
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <mat-toolbar class="bg-white border-b shadow-sm flex justify-between">
-      <div class="flex items-center">
-        <button mat-icon-button (click)="sidenav.toggle()" class="mr-2 md:hidden">
-          <mat-icon>menu</mat-icon>
-        </button>
-        <span class="text-lg font-medium">Strict Grounding with Gemini 1.5</span>
-      </div>
+    <mat-toolbar class="bg-white border-b shadow-sm">
+      <button mat-icon-button (click)="sidenav.toggle()" class="mr-3 lg:hidden">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span class="text-lg font-semibold text-gray-800">Strict Grounding with Gemini 2.5 Flash</span>
     </mat-toolbar>
 
-    <div class="bg-gray-50 min-h-[calc(100vh-64px)]">
+    <div class="bg-gray-50 h-[calc(100vh-64px)]">
       <router-outlet></router-outlet>
     </div>
   </mat-sidenav-content>

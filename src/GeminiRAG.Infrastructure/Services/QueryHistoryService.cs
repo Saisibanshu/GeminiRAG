@@ -10,18 +10,20 @@ public class QueryHistoryService : IQueryHistoryService
 {
     private readonly List<QueryHistory> _history = new();
 
-    public void AddQuery(QueryHistory entry)
+    public Task AddQueryAsync(QueryHistory entry)
     {
         _history.Add(entry);
+        return Task.CompletedTask;
     }
 
-    public List<QueryHistory> GetHistory()
+    public Task<List<QueryHistory>> GetHistoryAsync()
     {
-        return _history.ToList(); // Return copy
+        return Task.FromResult(_history.ToList()); // Return copy
     }
 
-    public void ClearHistory()
+    public Task ClearHistoryAsync()
     {
         _history.Clear();
+        return Task.CompletedTask;
     }
 }
