@@ -103,7 +103,7 @@ This application is configured to **prevent hallucination**:
 ### Tech Stack
 - **Backend**: C# 12, ASP.NET Core 9.0, Swagger/OpenAPI
 - **Frontend**: Angular 18, TypeScript, RxJS, Angular Material, TailwindCSS
-- **AI**: Google Gemini 1.5 Flash
+- **AI**: Google Gemini 2.5 Flash
 
 ## 🐛 Troubleshooting
 
