@@ -1,0 +1,7 @@
+.register-container {
+    min-height: 100vh;
+}
+
+.register-card {
+    border-radius: 16px !important;
+}

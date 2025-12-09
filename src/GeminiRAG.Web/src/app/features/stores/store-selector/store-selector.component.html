@@ -2,7 +2,7 @@
   <!-- Normal State - Full width layout -->
   <div *ngIf="!isCreating" class="w-full flex items-center gap-2">
     <div class="flex-1">
-      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full">
+      <mat-form-field appearance="fill" subscriptSizing="dynamic" class="w-full">
         <mat-label>Document Store</mat-label>
         <mat-select [value]="selectedStore" (selectionChange)="onStoreSelected($event.value)">
           <mat-option *ngFor="let store of stores" [value]="store">
@@ -27,7 +27,7 @@
   <!-- Create State - Full width layout -->
   <div *ngIf="isCreating" class="w-full flex items-center gap-2">
     <div class="flex-1">
-      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full">
+      <mat-form-field appearance="fill" subscriptSizing="dynamic" class="w-full">
         <mat-label>New Store Name</mat-label>
         <input matInput [(ngModel)]="newStoreName" placeholder="e.g., Project Docs" (keyup.enter)="createStore()"
           autofocus>

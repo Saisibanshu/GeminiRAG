@@ -7,6 +7,7 @@ public class QueryRequest
 {
     public required string Question { get; set; }
     public required string FileSearchStoreName { get; set; }
+    public Guid? StoreId { get; set; }  // Optional: for tracking which store was queried
     public float Temperature { get; set; } = 0.0f; // Strict grounding by default
     public int MaxOutputTokens { get; set; } = 2048;
 }

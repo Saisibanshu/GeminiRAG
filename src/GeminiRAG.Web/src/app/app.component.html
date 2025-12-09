@@ -26,12 +26,16 @@
         </a>
       </mat-nav-list>
 
-      <!-- Footer Info -->
-      <div class="mt-auto pt-4 border-t border-gray-700">
-        <div class="text-xs text-gray-400 flex items-center gap-2">
-          <mat-icon class="text-base">info</mat-icon>
-          <span>Powered by Gemini</span>
+      <!-- User Info & Logout -->
+      <div class="mt-auto pt-4 border-t border-gray-700" *ngIf="isAuthenticated">
+        <div class="text-xs text-gray-300 mb-2 flex items-center gap-2">
+          <mat-icon class="text-base">person</mat-icon>
+          <span class="truncate">{{ (authService.currentUser$ | async)?.displayName }}</span>
         </div>
+        <button mat-stroked-button (click)="logout()" class="w-full text-white border-gray-600 hover:bg-gray-700">
+          <mat-icon class="mr-2">logout</mat-icon>
+          Logout
+        </button>
       </div>
     </div>
   </mat-sidenav>

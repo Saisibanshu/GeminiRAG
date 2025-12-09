@@ -1,0 +1,7 @@
+.login-container {
+    min-height: 100vh;
+}
+
+.login-card {
+    border-radius: 16px !important;
+}

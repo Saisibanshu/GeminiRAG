@@ -60,7 +60,7 @@
         <mat-card-actions class="p-3 border-t bg-gray-50 flex-shrink-0">
             <div class="w-full flex items-center gap-3">
                 <div class="flex-1">
-                    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="w-full">
+                    <mat-form-field appearance="fill" subscriptSizing="dynamic" class="w-full">
                         <mat-label>Ask a question about your documents</mat-label>
                         <input matInput [(ngModel)]="question" (keyup.enter)="askQuestion()" [disabled]="isLoading"
                             placeholder="Press Enter to send">

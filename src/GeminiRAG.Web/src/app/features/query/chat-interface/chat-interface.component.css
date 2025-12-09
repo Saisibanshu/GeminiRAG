@@ -1,13 +1,1 @@
-/* Remove vertical lines from mat-form-field outline */
-.mat-mdc-text-field-wrapper .mat-mdc-notched-outline .mat-mdc-notched-outline__leading {
-    border-right: none !important;
-}
-
-.mat-mdc-text-field-wrapper .mat-mdc-notched-outline .mat-mdc-notched-outline__notch {
-    border-left: none !important;
-    border-right: none !important;
-}
-
-.mat-mdc-text-field-wrapper .mat-mdc-notched-outline .mat-mdc-notched-outline__trailing {
-    border-left: none !important;
-}
+/* No custom styles needed - fill appearance works perfectly */

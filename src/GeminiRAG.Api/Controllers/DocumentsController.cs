@@ -1,9 +1,11 @@
 using GeminiRAG.Core.Interfaces;
 using GeminiRAG.Core.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GeminiRAG.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class DocumentsController : ControllerBase
