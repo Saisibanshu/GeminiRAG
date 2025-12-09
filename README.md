@@ -1,29 +1,36 @@
-# Gemini RAG - Full Stack PDF Question Answering
+# Gemini RAG - Full Stack PDF Question Answering 🤖
 
-A modern, full-stack **Retrieval Augmented Generation (RAG)** application built with **.NET 9** and **Angular 18**. It leverages Google's **Gemini 2.5 Flash** model and **File Search Tool** to provide strictly grounded answers from your own PDF documents.
+A modern, full-stack **Retrieval Augmented Generation (RAG)** application built with **.NET 9** and **Angular 18**. It leverages Google's **Gemini 1.5 Flash** model to provide strictly grounded answers from your own PDF documents.
+
+## 📜 Table of Contents
+- [🏗️ Architecture](#️-architecture)
+- [✨ Features](#-features)
+- [🚀 Prerequisites](#-prerequisites)
+- [📦 Installation & Setup](#-installation--setup)
+- [🎮 Usage](#-usage)
+- [🔒 Strict Grounding Explained](#-strict-grounding-explained)
+- [🛠️ Technical Details](#️-technical-details)
+- [🐛 Troubleshooting](#-troubleshooting)
 
 ## 🏗️ Architecture
 
-The solution has been re-engineered into a scalable **Clean Architecture** to support enterprise-grade development:
+The solution is engineered into a scalable **Clean Architecture** to support enterprise-grade development:
 
-- **GeminiRAG.Core** 🧠
+- **`GeminiRAG.Core`** 🧠
   - The domain layer containing pure business logic, interfaces, and models.
   - Zero external dependencies.
 
-- **GeminiRAG.Infrastructure** 🔌
+- **`GeminiRAG.Infrastructure`** 🔌
   - Implementation layer for external services.
-  - Handles Gemini API communication and File Search operations.
+  - Handles Gemini API communication.
 
-- **GeminiRAG.Api** 🌐
+- **`GeminiRAG.Api`** 🌐
   - ASP.NET Core Web API serving as the backend.
   - Exposes endpoints for Stores, Documents, Queries, and History.
 
-- **GeminiRAG.Web** 🎨
+- **`GeminiRAG.Web`** 🎨
   - Modern Single Page Application (SPA) built with **Angular 18**.
   - Styled with **Angular Material** and **TailwindCSS**.
-
-- **GeminiRAG.Console** 🖥️
-  - Legacy console interface for quick, headless testing.
 
 ## ✨ Features
 
@@ -59,7 +66,7 @@ Edit `src/GeminiRAG.Api/appsettings.json` and add your key:
 ```
 
 ### 2. Start the Backend (API)
-The API handles all AI and File Search operations.
+The API handles all AI operations.
 ```bash
 dotnet run --project src/GeminiRAG.Api/GeminiRAG.Api.csproj
 ```
@@ -77,18 +84,11 @@ npx ng serve
 
 ## 🎮 Usage
 
-### Web UI
 1. Navigate to `http://localhost:4200`.
 2. **Select Store**: Choose an existing store or create a new one (e.g., "Project Alpha").
 3. **Upload**: Drag & drop or select PDF files to index them.
 4. **Chat**: Type your question. The AI will analyze *only* the documents in the selected store.
 5. **Review**: Check the "History" tab for previous interactions.
-
-### Console UI
-For quick testing without the browser:
-```bash
-dotnet run --project src/GeminiRAG.Console/GeminiRAG.Console.csproj
-```
 
 ## 🔒 Strict Grounding Explained
 
@@ -100,20 +100,14 @@ This application is configured to **prevent hallucination**:
 
 ## 🛠️ Technical Details
 
-### Hybrid Implementation
-We use a hybrid approach for maximum flexibility:
-- **Google.GenAI SDK**: For client initialization.
-- **REST API**: Direct calls for File Search operations (until fully supported by the SDK).
-
 ### Tech Stack
 - **Backend**: C# 12, ASP.NET Core 9.0, Swagger/OpenAPI
 - **Frontend**: Angular 18, TypeScript, RxJS, Angular Material, TailwindCSS
-- **AI**: Google Gemini 1.5 Flash, Google File Search API
+- **AI**: Google Gemini 2.5 Flash
 
 ## 🐛 Troubleshooting
 
 - **"Connection Refused" in Web UI**: Ensure the API is running on port `5109`.
-- **"File not found"**: Use absolute paths when using the Console app.
 - **"Quota Exceeded"**: Check your Google AI Studio quota limits.
 
 ---
