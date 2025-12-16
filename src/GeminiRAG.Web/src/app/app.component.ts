@@ -26,7 +26,7 @@ import { AuthService } from './core/services/auth.service';
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  title = 'Gemini RAG';
+  title = 'Versnn';
 
   constructor(public authService: AuthService, private router: Router) { }
 

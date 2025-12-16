@@ -76,7 +76,7 @@ public class FileSearchService : IFileSearchService
         return result?.Name ?? throw new Exception("Store name not returned");
     }
 
-    public async Task<string> UploadPdfAsync(string storeName, string filePath)
+    public async Task<string> UploadDocumentAsync(string storeName, string filePath)
     {
         if (string.IsNullOrEmpty(storeName))
         {
@@ -88,11 +88,11 @@ public class FileSearchService : IFileSearchService
             throw new FileNotFoundException($"File not found: {filePath}");
         }
 
-        Console.WriteLine($"[INFO] Uploading PDF: {Path.GetFileName(filePath)}...");
+        Console.WriteLine($"[INFO] Uploading document: {Path.GetFileName(filePath)}...");
 Console.WriteLine("[INFO] This may take a while for large files...");
 
         var fileBytes = await File.ReadAllBytesAsync(filePath);
-        var mimeType = "application/pdf";
+        var mimeType = GetMimeType(filePath);
         var numBytes = fileBytes.Length;
 
         // Step 1: Initiate resumable upload
@@ -161,7 +161,7 @@ Console.WriteLine("[INFO] This may take a while for large files...");
         {
             try
             {
-                var operationName = await UploadPdfAsync(storeName, filePath);
+                var operationName = await UploadDocumentAsync(storeName, filePath);
                 operationNames.Add(operationName);
             }
             catch (Exception ex)
@@ -265,7 +265,73 @@ Console.WriteLine("[INFO] This may take a while for large files...");
         }
     }
 
+    private string GetMimeType(string filePath)
+    {
+        var extension = Path.GetExtension(filePath).ToLowerInvariant();
 
+        return extension switch
+        {
+            // Documents
+            ".pdf" => "application/pdf",
+            ".doc" => "application/msword",
+            ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            ".odt" => "application/vnd.oasis.opendocument.text",
+            ".rtf" => "text/rtf",
+
+            // Spreadsheets
+            ".xls" => "application/vnd.ms-excel",
+            ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            ".csv" => "text/csv",
+            ".tsv" => "text/tab-separated-values",
+
+            // Presentations
+            ".ppt" => "application/vnd.ms-powerpoint",
+            ".pptx" => "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+
+            // Text files
+            ".txt" => "text/plain",
+            ".md" => "text/markdown",
+            ".markdown" => "text/markdown",
+            ".rst" => "text/prs.fallenstein.rst",
+            ".tex" => "application/x-tex",
+
+            // Code files
+            ".js" => "text/javascript",
+            ".jsx" => "text/jsx",
+            ".ts" => "application/typescript",
+            ".tsx" => "text/tsx",
+            ".py" => "text/x-python",
+            ".java" => "text/x-java-source",
+            ".c" => "text/x-c",
+            ".cpp" => "text/x-c++src",
+            ".h" => "text/x-c++hdr",
+            ".cs" => "text/x-csharp",
+            ".go" => "text/x-go",
+            ".rs" => "text/x-rust",
+            ".rb" => "text/x-ruby-script",
+            ".php" => "text/php",
+            ".swift" => "text/x-swift",
+            ".kt" => "text/x-kotlin",
+            ".scala" => "text/x-scala",
+            ".sh" => "text/x-sh",
+            ".ps1" => "application/x-powershell",
+            ".sql" => "application/sql",
+
+            // Markup & Data
+            ".html" => "text/html",
+            ".htm" => "text/html",
+            ".xml" => "text/xml",
+            ".json" => "application/json",
+            ".yaml" => "text/yaml",
+            ".yml" => "text/yaml",
+            ".css" => "text/css",
+            ".scss" => "text/x-scss",
+            ".sass" => "text/x-sass",
+
+            // Default
+            _ => "application/octet-stream"
+        };
+    }
 
     private async Task WaitForOperationAsync(string operationName)
     {
@@ -369,6 +435,7 @@ internal class FileSearchDocument
     [JsonPropertyName("createTime")]
     public string? CreateTime { get; set; }
 }
+
 
 internal class StoreListResponse
 {

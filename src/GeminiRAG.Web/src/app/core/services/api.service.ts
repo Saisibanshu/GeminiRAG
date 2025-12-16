@@ -17,6 +17,11 @@ export interface DocumentInfo {
   status: string;
 }
 
+export interface Citation {
+  source: string;
+  preview?: string;
+}
+
 export interface QueryRequest {
   question: string;
   fileSearchStoreName: string;
@@ -24,7 +29,7 @@ export interface QueryRequest {
 
 export interface QueryResponse {
   answer: string;
-  citations: string[];
+  citations: Citation[];
   responseTime: number;
   isFound: boolean;
 }
@@ -33,7 +38,7 @@ export interface QueryHistory {
   timestamp: Date;
   question: string;
   answer: string;
-  citations: string[];
+  citations: Citation[];
   responseTime: number;
   isFound: boolean;
 }
@@ -64,11 +69,14 @@ export class ApiService {
   getDocuments(storeName: string): Observable<DocumentInfo[]> {
     return this.http.get<DocumentInfo[]>(`${this.apiUrl}/documents`, { params: { storeName } });
   }
+  getSupportedFileTypes(): Observable<{ extensions: string[], count: number, message: string }> {
+    return this.http.get<{ extensions: string[], count: number, message: string }>(`${this.apiUrl}/documents/supported-types`);
+  }
 
-  uploadDocument(storeName: string, file: File): Observable<{ operation: string }> {
+  uploadDocument(storeName: string, file: File): Observable<{ operation: string, fileName: string, size: number, message: string }> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post<{ operation: string }>(`${this.apiUrl}/documents/upload`, formData, { params: { storeName } });
+    return this.http.post<{ operation: string, fileName: string, size: number, message: string }>(`${this.apiUrl}/documents/upload`, formData, { params: { storeName } });
   }
 
   deleteDocument(fileName: string): Observable<void> {

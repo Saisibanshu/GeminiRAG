@@ -75,6 +75,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IStoreRepository, StoreRepository>();
 builder.Services.AddScoped<IQueryHistoryService, QueryHistoryService>();
 builder.Services.AddScoped<IUserContextService, UserContextService>();
+builder.Services.AddScoped<IFileValidationService, FileValidationService>();
 builder.Services.AddSingleton<IFileSearchService>(sp => new FileSearchService(apiKey ?? ""));
 builder.Services.AddSingleton<IGeminiQueryService>(sp => new GeminiQueryService(apiKey ?? ""));
 builder.Services.AddSingleton<IExportService, ExportService>();
@@ -89,7 +90,12 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader());
 });
 
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
+
+
+app.MapHealthChecks("/health");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

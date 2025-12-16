@@ -21,7 +21,7 @@ public class QueryHistoryService : IQueryHistoryService
     {
         var historyEntity = new Core.Entities.QueryHistory
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.NewGuid(),    
             UserId = userId,
             StoreId = storeId,
             Question = entry.Question,
