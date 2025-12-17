@@ -58,7 +58,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            Remove-Item -Recurse -Force C:\inetpub\versnn-api\*
+            powershell -Command "Remove-Item -Recurse -Force C:\inetpub\versnn-api\*"
 
       - name: Deploy to IIS Server
         uses: appleboy/scp-action@v0.1.7

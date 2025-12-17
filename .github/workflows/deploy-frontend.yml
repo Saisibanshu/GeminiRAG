@@ -57,8 +57,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            Import-Module WebAdministration
-            Stop-WebSite -Name "versnn"
+            powershell -Command "Import-Module WebAdministration; Stop-WebSite -Name 'versnn'"
 
       - name: Clean IIS folder
         uses: appleboy/ssh-action@v1.0.3
@@ -78,8 +77,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            Import-Module WebAdministration
-            Start-WebSite -Name "versnn"
+            powershell -Command "Import-Module WebAdministration; Start-WebSite -Name 'versnn'"
 
       - name: Create web.config for Angular
         uses: appleboy/ssh-action@v1.0.3
