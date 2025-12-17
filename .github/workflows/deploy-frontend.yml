@@ -77,7 +77,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            powershell -Command "Import-Module WebAdministration; Start-Website -Name 'VersnnWeb'"
+            powershell -Command "Import-Module WebAdministration; $default = Get-Website -Name 'Default Web Site'; if ($default -and $default.State -eq 'Started') { Stop-Website -Name 'Default Web Site' }; Start-Website -Name 'VersnnWeb'"
 
       - name: Create web.config for Angular
         uses: appleboy/ssh-action@v1.0.3
