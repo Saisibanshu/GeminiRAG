@@ -37,17 +37,49 @@ jobs:
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
 
-      - name: Deploy to IIS Server
-        uses: appleboy/scp-action@v0.1.7
+      # - name: Deploy to IIS Server
+      #   uses: appleboy/scp-action@v0.1.7
+      #   with:
+      #     host: ${{ secrets.SERVER_HOST }}
+      #     username: ${{ secrets.SERVER_USER }}
+      #     password: ${{ secrets.SERVER_PASSWORD }}
+      #     port: ${{ secrets.SERVER_PORT }}
+      #     source: "src/GeminiRAG.Web/dist/*"
+      #     target: "C:/inetpub/wwwroot/versnn"
+      #     strip_components: 3
+      #     rm: true
+
+      - name: Stop IIS Site
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
-          source: "src/GeminiRAG.Web/dist/*"
-          target: "C:/inetpub/wwwroot/versnn"
-          strip_components: 3
-          rm: true
+          script: |
+            Import-Module WebAdministration
+            Stop-WebSite -Name "versnn"
+
+      - name: Clean IIS folder
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            Remove-Item -Recurse -Force C:\inetpub\wwwroot\versnn\*
+
+      - name: Start IIS Site
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            Import-Module WebAdministration
+            Start-WebSite -Name "versnn"
 
       - name: Create web.config for Angular
         uses: appleboy/ssh-action@v1.0.3
