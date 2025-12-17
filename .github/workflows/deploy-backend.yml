@@ -47,11 +47,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            Import-Module WebAdministration
-            if ((Get-WebAppPoolState -Name "VersnnApiPool").Value -eq "Started") {
-                Stop-WebAppPool -Name "VersnnApiPool"
-                Start-Sleep -Seconds 5
-            }
+            powershell -Command "Import-Module WebAdministration; if ((Get-WebAppPoolState -Name 'VersnnApiPool').Value -eq 'Started') { Stop-WebAppPool -Name 'VersnnApiPool'; Start-Sleep -Seconds 5 }"
 
       - name: Clean IIS folder
         uses: appleboy/ssh-action@v1.0.3
@@ -83,9 +79,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            Import-Module WebAdministration
-            Start-WebAppPool -Name "VersnnApiPool"
-            Start-Sleep -Seconds 3
+            powershell -Command "Import-Module WebAdministration; Start-WebAppPool -Name 'VersnnApiPool'; Start-Sleep -Seconds 3"
 
       - name: Verify Deployment
         uses: appleboy/ssh-action@v1.0.3
