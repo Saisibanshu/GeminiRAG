@@ -67,7 +67,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            Remove-Item -Recurse -Force C:\inetpub\wwwroot\versnn\*
+            powershell -Command "Remove-Item -Recurse -Force C:\inetpub\wwwroot\versnn\*"
 
       - name: Start IIS Site
         uses: appleboy/ssh-action@v1.0.3
@@ -87,31 +87,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            $webConfig = @"
-            <?xml version="1.0" encoding="utf-8"?>
-            <configuration>
-              <system.webServer>
-                <rewrite>
-                  <rules>
-                    <rule name="Angular Routes" stopProcessing="true">
-                      <match url=".*" />
-                      <conditions logicalGrouping="MatchAll">
-                        <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
-                        <add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
-                      </conditions>
-                      <action type="Rewrite" url="/" />
-                    </rule>
-                  </rules>
-                </rewrite>
-                <staticContent>
-                  <mimeMap fileExtension=".json" mimeType="application/json" />
-                  <mimeMap fileExtension=".woff" mimeType="application/font-woff" />
-                  <mimeMap fileExtension=".woff2" mimeType="application/font-woff2" />
-                </staticContent>
-              </system.webServer>
-            </configuration>
-            "@
-            Set-Content -Path "C:/inetpub/wwwroot/versnn/web.config" -Value $webConfig
+            powershell -Command "$webConfig = '<?xml version=\"1.0\" encoding=\"utf-8\"?><configuration><system.webServer><rewrite><rules><rule name=\"Angular Routes\" stopProcessing=\"true\"><match url=\".*\" /><conditions logicalGrouping=\"MatchAll\"><add input=\"{REQUEST_FILENAME}\" matchType=\"IsFile\" negate=\"true\" /><add input=\"{REQUEST_FILENAME}\" matchType=\"IsDirectory\" negate=\"true\" /></conditions><action type=\"Rewrite\" url=\"/\" /></rule></rules></rewrite><staticContent><mimeMap fileExtension=\".json\" mimeType=\"application/json\" /><mimeMap fileExtension=\".woff\" mimeType=\"application/font-woff\" /><mimeMap fileExtension=\".woff2\" mimeType=\"application/font-woff2\" /></staticContent></system.webServer></configuration>'; Set-Content -Path 'C:/inetpub/wwwroot/versnn/web.config' -Value $webConfig"
 
       - name: Verify Deployment
         uses: appleboy/ssh-action@v1.0.3
