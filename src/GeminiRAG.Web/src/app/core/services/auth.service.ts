@@ -25,13 +25,15 @@ export interface RegisterRequest {
   displayName: string;
 }
 
+import { environment } from '../../../environments/environment';
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   // private readonly API_URL = 'http://localhost:5109/api/auth';
   // private readonly API_URL = 'https://localhost:44386/api/auth';
-  private readonly API_URL = 'http://versnn.com:5000/api';
+  private API_URL = environment.apiUrl;
   private readonly TOKEN_KEY = 'auth_token';
   private readonly USER_KEY = 'current_user';
 

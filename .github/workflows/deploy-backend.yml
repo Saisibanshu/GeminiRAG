@@ -1,26 +1,22 @@
-name: Deploy Backend API
+name: Deploy Backend to IIS
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'src/**'
-      - '!src/GeminiRAG.Web/**'
-      - '.github/workflows/deploy-backend.yml'
+      - "src/**"
+      - "!src/GeminiRAG.Web/**"
+      - ".github/workflows/deploy-backend.yml"
   workflow_dispatch:
 
 env:
-  DOTNET_VERSION: '9.0.x'
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/backend
+  DOTNET_VERSION: "9.0.x"
+  PUBLISH_PATH: "./publish"
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+    runs-on: windows-latest
 
     steps:
       - name: Checkout code
@@ -40,62 +36,50 @@ jobs:
       - name: Test
         run: dotnet test src/GeminiRAG.Api/GeminiRAG.Api.csproj --configuration Release --no-build --verbosity normal
 
-      - name: Log in to Container Registry
-        uses: docker/login-action@v3
+      - name: Publish
+        run: dotnet publish src/GeminiRAG.Api/GeminiRAG.Api.csproj --configuration Release --output ${{ env.PUBLISH_PATH }} --no-build
+
+      - name: Stop IIS App Pool
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            C:\Windows\System32\inetsrv\appcmd.exe stop apppool /apppool.name:"VersnnApiPool"
+            timeout /t 5
 
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@v5
+      - name: Deploy to IIS Server
+        uses: appleboy/scp-action@v0.1.7
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix={{branch}}-
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT }}
+          source: "${{ env.PUBLISH_PATH }}/*"
+          target: "C:/inetpub/versnn-api"
+          strip_components: 1
+          rm: true
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+      - name: Start IIS App Pool
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          context: ./src
-          file: ./src/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            C:\Windows\System32\inetsrv\appcmd.exe start apppool /apppool.name:"VersnnApiPool"
+            timeout /t 3
+            C:\Windows\System32\inetsrv\appcmd.exe recycle apppool /apppool.name:"VersnnApiPool"
 
-      # Deploy to your hosting service
-      # Uncomment and configure for your hosting provider (Azure, AWS, DigitalOcean, etc.)
-      
-      # - name: Deploy to Azure Web App
-      #   uses: azure/webapps-deploy@v2
-      #   with:
-      #     app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
-      #     publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-      #     images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
-
-      # - name: Deploy to AWS ECS
-      #   # Add AWS ECS deployment steps here
-
-      # - name: Deploy via SSH
-      #   uses: appleboy/ssh-action@master
-      #   with:
-      #     host: ${{ secrets.SERVER_HOST }}
-      #     username: ${{ secrets.SERVER_USER }}
-      #     key: ${{ secrets.SERVER_SSH_KEY }}
-      #     script: |
-      #       docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-      #       docker stop versnn-backend || true
-      #       docker rm versnn-backend || true
-      #       docker run -d --name versnn-backend \
-      #         -p 5000:8080 \
-      #         -e ASPNETCORE_ENVIRONMENT=Production \
-      #         -e ConnectionStrings__DefaultConnection="${{ secrets.DB_CONNECTION_STRING }}" \
-      #         -e Jwt__SecretKey="${{ secrets.JWT_SECRET_KEY }}" \
-      #         -e GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" \
-      #         --restart unless-stopped \
-      #         ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+      - name: Verify Deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            powershell -Command "Test-Path C:/inetpub/versnn-api/GeminiRAG.Api.dll"

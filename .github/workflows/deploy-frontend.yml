@@ -1,4 +1,4 @@
-name: Deploy Frontend
+name: Deploy Frontend to IIS
 
 on:
   push:
@@ -11,15 +11,10 @@ on:
 
 env:
   NODE_VERSION: "20.x"
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/frontend
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
 
     steps:
       - name: Checkout code
@@ -42,72 +37,58 @@ jobs:
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
 
-      - name: Run tests
-        working-directory: src/GeminiRAG.Web
-        run: npm run test -- --watch=false --browsers=ChromeHeadless
-
-      - name: Log in to Container Registry
-        uses: docker/login-action@v3
+      - name: Deploy to IIS Server
+        uses: appleboy/scp-action@v0.1.7
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT }}
+          source: "src/GeminiRAG.Web/dist/*"
+          target: "C:/inetpub/wwwroot/versnn"
+          strip_components: 3
+          rm: true
 
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@v5
+      - name: Create web.config for Angular
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix={{branch}}-
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            $webConfig = @"
+            <?xml version="1.0" encoding="utf-8"?>
+            <configuration>
+              <system.webServer>
+                <rewrite>
+                  <rules>
+                    <rule name="Angular Routes" stopProcessing="true">
+                      <match url=".*" />
+                      <conditions logicalGrouping="MatchAll">
+                        <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
+                        <add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
+                      </conditions>
+                      <action type="Rewrite" url="/" />
+                    </rule>
+                  </rules>
+                </rewrite>
+                <staticContent>
+                  <mimeMap fileExtension=".json" mimeType="application/json" />
+                  <mimeMap fileExtension=".woff" mimeType="application/font-woff" />
+                  <mimeMap fileExtension=".woff2" mimeType="application/font-woff2" />
+                </staticContent>
+              </system.webServer>
+            </configuration>
+            "@
+            Set-Content -Path "C:/inetpub/wwwroot/versnn/web.config" -Value $webConfig
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+      - name: Verify Deployment
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          context: ./src/GeminiRAG.Web
-          file: ./src/GeminiRAG.Web/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-      # Deploy to hosting service
-      # Uncomment and configure for your hosting provider
-
-      # - name: Deploy to Netlify
-      #   uses: nwtgck/actions-netlify@v2
-      #   with:
-      #     publish-dir: './src/GeminiRAG.Web/dist'
-      #     production-branch: main
-      #     github-token: ${{ secrets.GITHUB_TOKEN }}
-      #     deploy-message: "Deploy from GitHub Actions"
-      #   env:
-      #     NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-      #     NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-
-      # - name: Deploy to Vercel
-      #   uses: amondnet/vercel-action@v25
-      #   with:
-      #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
-      #     vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-      #     vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-      #     working-directory: ./src/GeminiRAG.Web
-
-      # - name: Deploy via SSH to Static Host
-      #   uses: appleboy/ssh-action@master
-      #   with:
-      #     host: ${{ secrets.SERVER_HOST }}
-      #     username: ${{ secrets.SERVER_USER }}
-      #     key: ${{ secrets.SERVER_SSH_KEY }}
-      #     script: |
-      #       docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-      #       docker stop versnn-frontend || true
-      #       docker rm versnn-frontend || true
-      #       docker run -d --name versnn-frontend \
-      #         -p 80:80 \
-      #         -p 443:443 \
-      #         --restart unless-stopped \
-      #         ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            powershell -Command "Test-Path C:/inetpub/wwwroot/versnn/index.html"

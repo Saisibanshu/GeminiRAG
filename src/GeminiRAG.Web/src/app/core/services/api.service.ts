@@ -43,13 +43,13 @@ export interface QueryHistory {
   isFound: boolean;
 }
 
+import { environment } from '../../../environments/environment';
+
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  // private apiUrl = 'http://localhost:5109/api'; // Updated port
-  // private apiUrl = 'https://localhost:44386/api'; // Updated port for IIS Express
-  private apiUrl = 'http://versnn.com:5000/api'; // Updated domain
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 
