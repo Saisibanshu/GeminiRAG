@@ -47,8 +47,11 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            C:\Windows\System32\inetsrv\appcmd.exe stop apppool /apppool.name:"VersnnApiPool"
-            timeout /t 5
+            Import-Module WebAdministration
+            if ((Get-WebAppPoolState -Name "VersnnApiPool").Value -eq "Started") {
+                Stop-WebAppPool -Name "VersnnApiPool"
+                Start-Sleep -Seconds 5
+            }
 
       - name: Clean IIS folder
         uses: appleboy/ssh-action@v1.0.3
@@ -80,9 +83,9 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            C:\Windows\System32\inetsrv\appcmd.exe start apppool /apppool.name:"VersnnApiPool"
-            timeout /t 3
-            C:\Windows\System32\inetsrv\appcmd.exe recycle apppool /apppool.name:"VersnnApiPool"
+            Import-Module WebAdministration
+            Start-WebAppPool -Name "VersnnApiPool"
+            Start-Sleep -Seconds 3
 
       - name: Verify Deployment
         uses: appleboy/ssh-action@v1.0.3
