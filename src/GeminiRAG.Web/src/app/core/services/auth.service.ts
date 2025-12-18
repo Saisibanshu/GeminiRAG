@@ -33,7 +33,7 @@ import { environment } from '../../../environments/environment';
 export class AuthService {
   // private readonly API_URL = 'http://localhost:5109/api/auth';
   // private readonly API_URL = 'https://localhost:44386/api/auth';
-  private API_URL = environment.apiUrl;
+  private API_URL = `${environment.apiUrl}/auth`;
   private readonly TOKEN_KEY = 'auth_token';
   private readonly USER_KEY = 'current_user';
 
