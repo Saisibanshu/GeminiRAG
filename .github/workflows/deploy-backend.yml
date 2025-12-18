@@ -47,7 +47,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            powershell -Command "Import-Module WebAdministration; $pool = Get-Item 'IIS:\AppPools\VersnnApiPool'; $pool.processModel.environmentVariables.Add(@{name='ConnectionStrings__DefaultConnection';value='${{ secrets.DB_CONNECTION_STRING }}'}); \$pool | Set-Item"
+            powershell -Command "Import-Module WebAdministration; $poolName = 'VersnnApiPool'; if (Test-Path \"IIS:\AppPools\$poolName\") { $pool = Get-Item \"IIS:\AppPools\$poolName\"; $vars = $pool.processModel.environmentVariables; $item = $vars | Where-Object { $_.name -eq 'ConnectionStrings__DefaultConnection' }; if ($item) { $vars.Remove($item) }; $vars.Add(@{name='ConnectionStrings__DefaultConnection';value='${{ secrets.DB_CONNECTION_STRING }}'}); $pool | Set-Item } else { Write-Error \"App Pool '$poolName' not found.\"; exit 1 }"
 
       - name: Stop IIS App Pool
         uses: appleboy/ssh-action@v1.0.3
