@@ -70,7 +70,7 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           source: "src/GeminiRAG.Web/dist/gemini-rag.web/browser/*"
           target: "C:/inetpub/wwwroot/versnn"
-          strip_components: 4
+          strip_components: 5
           rm: false
 
       - name: Start IIS Site
