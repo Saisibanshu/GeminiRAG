@@ -83,9 +83,9 @@ builder.Services.AddSingleton<IExportService, ExportService>();
 // CORS configuration for Angular
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngular",
+    options.AddPolicy("ProdCors",
         policy => policy
-            .WithOrigins("http://localhost:4200") // Angular default port
+            .WithOrigins("https://versnn.com") // Angular default port
             .AllowAnyMethod()
             .AllowAnyHeader());
 });
@@ -104,7 +104,7 @@ app.MapHealthChecks("/health");
     app.UseSwaggerUI();
 //}
 
-app.UseCors("AllowAngular");
+app.UseCors("ProdCors");
 
 app.UseHttpsRedirection();
 
